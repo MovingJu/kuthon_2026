@@ -1,0 +1,49 @@
+services:
+  nginx:
+    image: movingju/public:khuthon_nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    restart: unless-stopped
+    depends_on:
+      - front
+      - api
+
+  front:
+    image: movingju/public:kuthon_front
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  api:
+    image: dkwonid/khuthon-api:latest
+    platform: linux/arm64
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./vertex_key.json:/app/vertex_key.json:ro
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  chat:
+    build:
+      context: ./server/chat_server
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/app/data
+    env_file:
+      - .env
+    restart: unless-stopped
