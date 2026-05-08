@@ -3,3 +3,5 @@
 CLAUDE.md
 memory
 .env
+vertex_key.json
+google-services.json
